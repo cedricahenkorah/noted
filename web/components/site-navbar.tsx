@@ -12,7 +12,8 @@ export function SiteNavbar() {
             <NotebookText className="h-6 w-6" />
             <span className="font-bold">noted</span>
           </Link>
-          <nav className="flex items-center space-x-6 text-sm font-medium">
+
+          <nav className="hidden lg:flex items-center space-x-6 text-sm font-medium">
             <Link
               href="#features"
               className="transition-colors hover:text-foreground/80"
@@ -33,6 +34,7 @@ export function SiteNavbar() {
             </Link>
           </nav>
         </div>
+
         <div className="flex flex-1 items-center justify-end space-x-2">
           <nav className="flex items-center space-x-2">
             <ModeToggle />
