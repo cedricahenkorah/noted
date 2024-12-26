@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Pencil } from "lucide-react";
+import { NotebookText } from "lucide-react";
 import { ModeToggle } from "./mode-toggle";
 import { Button } from "./ui/button";
 
@@ -9,7 +9,7 @@ export function SiteNavbar() {
       <div className="container mx-auto flex h-14 items-center">
         <div className="mr-4 flex">
           <Link href="/" className="mr-6 flex items-center space-x-2">
-            <Pencil className="h-6 w-6" />
+            <NotebookText className="h-6 w-6" />
             <span className="font-bold">noted</span>
           </Link>
           <nav className="flex items-center space-x-6 text-sm font-medium">
@@ -37,7 +37,7 @@ export function SiteNavbar() {
           <nav className="flex items-center space-x-2">
             <ModeToggle />
             <Button variant="ghost" asChild>
-              <Link href="/login">Sign in</Link>
+              <Link href="/auth">Sign in</Link>
             </Button>
             <Button asChild>
               <Link href="/register">Get Started</Link>

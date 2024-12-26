@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Pencil } from "lucide-react";
+import { NotebookText } from "lucide-react";
 
 const footerLinks = {
   product: [
@@ -28,7 +28,7 @@ export function SiteFooter() {
       <div className="container mx-auto grid gap-8 py-16 md:grid-cols-2 lg:grid-cols-4">
         <div className="space-y-4">
           <Link href="/" className="flex items-center space-x-2">
-            <Pencil className="h-6 w-6" />
+            <NotebookText className="h-6 w-6" />
             <span className="font-bold">noted</span>
           </Link>
           <p className="text-sm text-muted-foreground">
