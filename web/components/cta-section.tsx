@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 export function CTASection() {
   return (
     <section className="border-t">
-      <div className="container mx-auto py-24 md:py-32">
+      <div className="container mx-auto py-24 md:py-32 px-5 lg:px-0">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

@@ -28,7 +28,7 @@ export function FeaturesSection() {
   return (
     <section
       id="features"
-      className="container mx-auto space-y-16 py-24 md:py-32 lg:py-40"
+      className="container mx-auto space-y-16 py-24 md:py-32 lg:py-40 px-5 lg:px-0"
     >
       <div className="mx-auto text-center md:max-w-[58rem]">
         <h2 className="text-3xl font-bold leading-tight tracking-tighter md:text-5xl lg:leading-[1.1]">

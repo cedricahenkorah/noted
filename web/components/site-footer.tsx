@@ -25,7 +25,7 @@ const footerLinks = {
 export function SiteFooter() {
   return (
     <footer className="border-t">
-      <div className="container mx-auto grid gap-8 py-16 md:grid-cols-2 lg:grid-cols-4">
+      <div className="container mx-auto grid gap-8 py-16 md:grid-cols-2 lg:grid-cols-4 px-5 lg:px-0">
         <div className="space-y-4">
           <Link href="/" className="flex items-center space-x-2">
             <NotebookText className="h-6 w-6" />
@@ -87,7 +87,7 @@ export function SiteFooter() {
       </div>
 
       <div className="border-t">
-        <div className="container mx-auto flex flex-col gap-4 py-6 text-center text-sm text-muted-foreground md:flex-row md:justify-between">
+        <div className="container mx-auto flex flex-col gap-4 py-6 px-5 lg:px-0 text-center text-sm text-muted-foreground md:flex-row md:justify-between">
           <p>© {new Date().getFullYear()} noted. All rights reserved.</p>
           <p>
             Crafted by{" "}

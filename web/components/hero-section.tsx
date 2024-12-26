@@ -10,7 +10,7 @@ export function HeroSection() {
   return (
     <div className="relative">
       <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-background to-background" />
-      <div className="container relative mx-auto">
+      <div className="container relative mx-auto px-5 lg:px-0">
         <div className="flex flex-col items-center justify-center space-y-10 py-32 text-center md:py-36 lg:py-40">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -49,16 +49,18 @@ export function HeroSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="flex justify-center gap-8"
+            className="flex justify-center gap-4 lg:gap-8"
           >
             <div className="flex items-center space-x-2">
               <Pencil className="h-4 w-4 text-primary" />
               <span className="text-sm">Text Notes</span>
             </div>
+
             <div className="flex items-center space-x-2">
               <Mic className="h-4 w-4 text-primary" />
               <span className="text-sm">Voice Recording</span>
             </div>
+
             <div className="flex items-center space-x-2">
               <PenTool className="h-4 w-4 text-primary" />
               <span className="text-sm">Canvas Drawing</span>
