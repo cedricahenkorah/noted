@@ -42,7 +42,7 @@ export function SiteNavbar() {
               <Link href="/auth">Sign in</Link>
             </Button>
             <Button asChild>
-              <Link href="/register">Get Started</Link>
+              <Link href="/auth/sign-up">Get Started</Link>
             </Button>
           </nav>
         </div>
