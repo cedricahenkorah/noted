@@ -1,10 +1,13 @@
 import {
+  Archive,
   Home,
   LayoutTemplate,
   Notebook,
   NotebookPen,
   NotebookText,
+  Star,
   Tags,
+  Trash,
   Users,
 } from "lucide-react";
 
@@ -28,7 +31,7 @@ import Link from "next/link";
 const items = [
   {
     title: "Home",
-    url: "#",
+    url: "/dashboard/",
     icon: Home,
   },
   {
@@ -55,6 +58,21 @@ const items = [
     title: "Shared with Me",
     url: "#",
     icon: Users,
+  },
+  {
+    title: "Trash",
+    url: "#",
+    icon: Trash,
+  },
+  {
+    title: "Archive",
+    url: "#",
+    icon: Archive,
+  },
+  {
+    title: "Starred",
+    url: "#",
+    icon: Star,
   },
 ];
 

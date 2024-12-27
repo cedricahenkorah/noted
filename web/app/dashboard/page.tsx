@@ -1,12 +1,39 @@
+"use client";
+
+import { QuickActions } from "@/components/quick-actions";
+import { RecentNotes } from "@/components/recent-notes";
+import { StatsCards } from "@/components/stats-card";
+import { useEffect, useState } from "react";
+
 export default function Dashboard() {
+  const [greeting, setGreeting] = useState<string>("");
+
+  useEffect(() => {
+    const currentHour = new Date().getHours();
+    let greetingMessage = "";
+
+    if (currentHour >= 5 && currentHour < 12) {
+      greetingMessage = "Good morning";
+    } else if (currentHour >= 12 && currentHour < 18) {
+      greetingMessage = "Good afternoon";
+    } else {
+      greetingMessage = "Good evening";
+    }
+
+    setGreeting(greetingMessage);
+  }, []);
+
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4 pt-0 h-full">
-      <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-        <div className="aspect-video rounded-xl bg-muted/50 animate-pulse" />
-        <div className="aspect-video rounded-xl bg-muted/50 animate-pulse" />
-        <div className="aspect-video rounded-xl bg-muted/50 animate-pulse" />
+    <div className="flex-1 space-y-6 p-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <p className="text-muted-foreground">
+          {greeting}! Here&apos;s an overview of your notes.
+        </p>
       </div>
-      <div className="flex-1 rounded-xl bg-muted/50 animate-pulse" />
+      <StatsCards />
+      <QuickActions />
+      <RecentNotes />
     </div>
   );
 }
