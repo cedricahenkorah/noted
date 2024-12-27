@@ -36,7 +36,7 @@ const items = [
   },
   {
     title: "Notes",
-    url: "#",
+    url: "/dashboard/notes/",
     icon: NotebookPen,
   },
   {
