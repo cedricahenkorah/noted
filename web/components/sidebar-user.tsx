@@ -30,6 +30,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import Avatar from "boring-avatars";
+import { SignOut } from "@/app/actions/sign-out";
 
 export function SideBarUser({
   user,
@@ -97,7 +98,7 @@ export function SideBarUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => SignOut()}>
               <LogOut />
               Log out
             </DropdownMenuItem>
