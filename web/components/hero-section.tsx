@@ -38,7 +38,7 @@ export function HeroSection() {
             className="flex flex-col gap-4 min-[400px]:flex-row"
           >
             <Button size="lg" asChild>
-              <Link href="/register">Start for free</Link>
+              <Link href="/auth/sign-up">Start for free</Link>
             </Button>
             <Button size="lg" variant="outline" asChild>
               <Link href="#features">See how it works</Link>
