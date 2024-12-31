@@ -1,16 +1,4 @@
-import {
-  Archive,
-  Home,
-  LayoutTemplate,
-  Notebook,
-  NotebookPen,
-  NotebookText,
-  Star,
-  Tags,
-  Trash,
-  Users,
-} from "lucide-react";
-
+import { NotebookText } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -26,65 +14,18 @@ import {
 } from "@/components/ui/sidebar";
 import { SideBarUser } from "./sidebar-user";
 import Link from "next/link";
+import { auth } from "@/auth";
+import { sideMenuItems } from "@/constants";
 
-// Menu items.
-const items = [
-  {
-    title: "Home",
-    url: "/dashboard/",
-    icon: Home,
-  },
-  {
-    title: "Notes",
-    url: "/dashboard/notes/",
-    icon: NotebookPen,
-  },
-  {
-    title: "Notebooks",
-    url: "#",
-    icon: Notebook,
-  },
-  {
-    title: "Templates",
-    url: "#",
-    icon: LayoutTemplate,
-  },
-  {
-    title: "Tags",
-    url: "#",
-    icon: Tags,
-  },
-  {
-    title: "Shared with Me",
-    url: "#",
-    icon: Users,
-  },
-  {
-    title: "Trash",
-    url: "#",
-    icon: Trash,
-  },
-  {
-    title: "Archive",
-    url: "#",
-    icon: Archive,
-  },
-  {
-    title: "Starred",
-    url: "#",
-    icon: Star,
-  },
-];
+export async function AppSidebar() {
+  const session = await auth();
 
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-};
+  const user = {
+    name: session?.user?.name as string,
+    email: session?.user?.email as string,
+    avatar: session?.user?.image as string,
+  };
 
-export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
@@ -110,7 +51,7 @@ export function AppSidebar() {
           <SidebarGroupLabel>Dashboard</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
+              {sideMenuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <a href={item.url}>
@@ -126,7 +67,7 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter>
-        <SideBarUser user={data.user} />
+        <SideBarUser user={user} />
       </SidebarFooter>
 
       <SidebarRail />
