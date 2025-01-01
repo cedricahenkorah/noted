@@ -1,16 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Tag } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import "@/components/notes/editor.css";
+import { EditorToolbar } from "./editor-toolbar";
 
 export function EditorContent() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState("");
+  const [isEmpty, setIsEmpty] = useState(true);
+  const editorRef = useRef<HTMLDivElement>(null);
 
   const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && newTag.trim()) {
@@ -19,50 +23,252 @@ export function EditorContent() {
     }
   };
 
+  const formatText = useCallback((command: string, value?: string) => {
+    document.execCommand(command, false, value);
+  }, []);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "b" && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      formatText("bold");
+    }
+    if (e.key === "i" && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      formatText("italic");
+    }
+    if (e.key === "u" && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      formatText("underline");
+    }
+  };
+
+  const handleInsert = (type: "image" | "table" | "code" | "divider") => {
+    const selection = window.getSelection();
+    if (!selection || !editorRef.current) return;
+
+    const range = selection.getRangeAt(0);
+    const newElement = document.createElement("div");
+
+    switch (type) {
+      case "image":
+        const fileInput = document.createElement("input");
+        fileInput.type = "file";
+        fileInput.accept = "image/*";
+
+        fileInput.onchange = async () => {
+          const file = fileInput.files?.[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              const img = document.createElement("img");
+              img.src = e.target?.result as string;
+              img.alt = "Uploaded image";
+              img.style.width = "300px";
+              img.style.height = "auto";
+
+              const selection = window.getSelection();
+              if (selection && editorRef.current) {
+                const range = selection.getRangeAt(0);
+                range.deleteContents();
+                range.insertNode(img);
+
+                // Move the cursor to the end of the inserted image
+                range.setStartAfter(img);
+                range.setEndAfter(img);
+                selection.removeAllRanges();
+                selection.addRange(range);
+
+                // Trigger the onInput event to update the content state
+                const inputEvent = new Event("input", {
+                  bubbles: true,
+                  cancelable: true,
+                });
+                editorRef.current.dispatchEvent(inputEvent);
+
+                // Add resize handles
+                addResizeHandles(img);
+              }
+            };
+            reader.readAsDataURL(file);
+          }
+        };
+
+        // Simulate a click on the file input
+        fileInput.click();
+        return; // Exit here to wait for file selection
+
+      case "table":
+        newElement.innerHTML = `
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+              <th style="border: 1px solid #ddd; padding: 8px;">Header 1</th>
+              <th style="border: 1px solid #ddd; padding: 8px;">Header 2</th>
+            </tr>
+            <tr>
+              <td style="border: 1px solid #ddd; padding: 8px;">Row 1, Cell 1</td>
+              <td style="border: 1px solid #ddd; padding: 8px;">Row 1, Cell 2</td>
+            </tr>
+          </table>
+        `;
+        break;
+      case "code":
+        newElement.innerHTML =
+          '<pre style="background-color: #f4f4f4; padding: 10px; border-radius: 4px;"><code>// Your code here</code></pre>';
+        break;
+      case "divider":
+        newElement.innerHTML =
+          '<hr style="border: none; border-top: 1px solid #ddd; margin: 10px 0;" />';
+        break;
+    }
+
+    range.deleteContents();
+    range.insertNode(newElement);
+
+    // Move the cursor to the end of the inserted content
+    range.setStartAfter(newElement);
+    range.setEndAfter(newElement);
+    selection.removeAllRanges();
+    selection.addRange(range);
+
+    // Trigger the onInput event to update the content state
+    const inputEvent = new Event("input", { bubbles: true, cancelable: true });
+    editorRef.current.dispatchEvent(inputEvent);
+  };
+
+  const addResizeHandles = (img: HTMLImageElement) => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "image-wrapper";
+    wrapper.style.position = "relative";
+    wrapper.style.display = "inline-block";
+    img.parentNode?.insertBefore(wrapper, img);
+    wrapper.appendChild(img);
+
+    const handles = ["nw", "ne", "sw", "se"];
+    handles.forEach((pos) => {
+      const handle = document.createElement("div");
+      handle.className = `resize-handle ${pos}`;
+      wrapper.appendChild(handle);
+    });
+
+    const removeButton = document.createElement("button");
+    removeButton.className = "remove-image-button";
+    removeButton.innerHTML =
+      '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
+    removeButton.setAttribute("aria-label", "Remove image");
+    removeButton.onclick = (e) => {
+      e.preventDefault();
+      wrapper.remove();
+      // Trigger the onInput event to update the content state
+      const inputEvent = new Event("input", {
+        bubbles: true,
+        cancelable: true,
+      });
+      editorRef.current?.dispatchEvent(inputEvent);
+    };
+    wrapper.appendChild(removeButton);
+  };
+
+  useEffect(() => {
+    const editor = editorRef.current;
+    if (!editor) return;
+
+    let resizedImage: HTMLImageElement | null = null;
+    let startX: number, startY: number, startWidth: number, startHeight: number;
+
+    const handleMouseDown = (e: MouseEvent) => {
+      if (
+        e.target instanceof HTMLElement &&
+        e.target.classList.contains("resize-handle")
+      ) {
+        e.preventDefault();
+        resizedImage =
+          e.target.closest(".image-wrapper")?.querySelector("img") || null;
+        startX = e.clientX;
+        startY = e.clientY;
+        startWidth = resizedImage?.width || 0;
+        startHeight = resizedImage?.height || 0;
+        document.addEventListener("mousemove", handleMouseMove);
+        document.addEventListener("mouseup", handleMouseUp);
+      }
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!resizedImage) return;
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      resizedImage.style.width = `${startWidth + dx}px`;
+      resizedImage.style.height = `${startHeight + dy}px`;
+    };
+
+    const handleMouseUp = () => {
+      resizedImage = null;
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+
+    editor.addEventListener("mousedown", handleMouseDown);
+
+    return () => {
+      editor.removeEventListener("mousedown", handleMouseDown);
+    };
+  }, []);
+
   return (
-    <div className="flex flex-col flex-1 p-4">
-      <input
-        type="text"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        placeholder="Title"
-        className="text-3xl font-bold bg-transparent border-none outline-none mb-4 placeholder:text-muted-foreground"
-      />
-
-      <div className="flex-1">
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="Start writing, drag files or start from a template"
-          className="w-full h-full min-h-[200px] bg-transparent border-none outline-none resize-none placeholder:text-muted-foreground"
+    <div className="flex flex-col flex-1">
+      <EditorToolbar onInsert={handleInsert} />
+      <div className="flex flex-col flex-1 p-4">
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Title"
+          className="text-3xl font-bold bg-transparent border-none outline-none mb-4 placeholder:text-muted-foreground"
         />
-      </div>
 
-      <div className="flex items-center gap-4 mt-4 mb-10">
-        <Button variant="outline" className="gap-2">
-          My templates
-        </Button>
+        <div
+          ref={editorRef}
+          contentEditable
+          onKeyDown={handleKeyDown}
+          className={`flex-1 min-h-[200px] outline-none whitespace-pre-wrap break-words ${
+            isEmpty ? "is-empty" : ""
+          }`}
+          data-placeholder="Start writing, drag files or start from a template"
+          onInput={(e) => {
+            const newContent = e.currentTarget.textContent || "";
+            setContent(newContent);
+            setIsEmpty(newContent.trim() === "");
+          }}
+        />
 
-        <Button variant="outline" className="gap-2">
-          Discover more templates
-        </Button>
+        <div className="flex items-center gap-4 mt-4 mb-10">
+          <Button variant="outline" className="gap-2">
+            My templates
+          </Button>
 
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Tag className="h-4 w-4" />
-          <div className="flex flex-wrap gap-2">
-            {tags.map((tag, index) => (
-              <span key={index} className="bg-secondary px-2 py-1 rounded-full">
-                {tag}
-              </span>
-            ))}
-            <Input
-              type="text"
-              value={newTag}
-              onChange={(e) => setNewTag(e.target.value)}
-              onKeyDown={handleAddTag}
-              placeholder="Add tag"
-              className="w-20 h-6 bg-transparent border-none text-sm p-0 placeholder:text-muted-foreground focus-visible:ring-0"
-            />
+          <Button variant="outline" className="gap-2">
+            Discover more templates
+          </Button>
+
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Tag className="h-4 w-4" />
+            <div className="flex flex-wrap gap-2">
+              {tags.map((tag, index) => (
+                <span
+                  key={index}
+                  className="bg-secondary px-2 py-1 rounded-full"
+                >
+                  {tag}
+                </span>
+              ))}
+              <Input
+                type="text"
+                value={newTag}
+                onChange={(e) => setNewTag(e.target.value)}
+                onKeyDown={handleAddTag}
+                placeholder="Add tag"
+                className="w-20 h-6 bg-transparent border-none text-sm p-0 placeholder:text-muted-foreground focus-visible:ring-0"
+              />
+            </div>
           </div>
         </div>
       </div>

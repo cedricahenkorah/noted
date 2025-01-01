@@ -1,0 +1,98 @@
+[contenteditable="true"]:empty:before {
+  content: attr(data-placeholder);
+  color: #888;
+  pointer-events: none;
+}
+
+[contenteditable="true"].is-empty:before {
+  content: attr(data-placeholder);
+  color: #888;
+  pointer-events: none;
+  position: absolute;
+}
+
+[contenteditable="true"]:focus {
+  outline: none;
+}
+
+.image-wrapper {
+  display: inline-block;
+  position: relative;
+  max-width: 300px;
+}
+
+.image-wrapper img {
+  max-width: 100%;
+  height: auto;
+}
+
+.resize-handle {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background-color: #007bff;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.image-wrapper:hover .resize-handle {
+  opacity: 1;
+}
+
+.resize-handle.nw {
+  top: -5px;
+  left: -5px;
+  cursor: nw-resize;
+}
+.resize-handle.ne {
+  top: -5px;
+  right: -5px;
+  cursor: ne-resize;
+}
+.resize-handle.sw {
+  bottom: -5px;
+  left: -5px;
+  cursor: sw-resize;
+}
+.resize-handle.se {
+  bottom: -5px;
+  right: -5px;
+  cursor: se-resize;
+}
+
+[contenteditable="true"] img {
+  max-width: 100%;
+  height: auto;
+}
+
+.remove-image-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.image-wrapper:hover .remove-image-button {
+  opacity: 1;
+}
+
+.remove-image-button:hover {
+  background-color: rgba(255, 255, 255, 1);
+}
+
+.remove-image-button svg {
+  width: 16px;
+  height: 16px;
+  color: #333;
+}
