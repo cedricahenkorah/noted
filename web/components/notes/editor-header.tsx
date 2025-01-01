@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronRight, MoreHorizontal, User } from "lucide-react";
+import { ChevronRight, MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
@@ -29,20 +29,7 @@ export function EditorHeader() {
         <Button variant="secondary" className="text-sm">
           Share note
         </Button>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <User className="h-4 w-4" />
-              <span className="sr-only">User menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Log out</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon">
