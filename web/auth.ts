@@ -32,7 +32,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           });
 
           user = {
-            id: response?.data?.data?.user?._id,
+            id: response?.data?.data?.user?._id as string,
             name: response?.data?.data?.user?.name,
             email: response?.data?.data?.user?.email,
             image: response?.data?.data?.user?.displayPhoto,
@@ -64,6 +64,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     authorized: async ({ auth }) => {
       // Logged in users are authenticated, otherwise redirect to login page
       return !!auth;
+    },
+    jwt({ token, user }) {
+      if (user) {
+        // User is available during sign-in
+        token.id = user.id;
+      }
+      return token;
+    },
+    session({ session, token }) {
+      session.user.id = token.id as string;
+      return session;
     },
   },
 });
