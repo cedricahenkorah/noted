@@ -1,7 +1,4 @@
-"use client";
-
 import { Grid, List, Plus, Search } from "lucide-react";
-import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,13 +9,60 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { toast } from "sonner";
+import { createNote } from "@/lib/notes";
+import { useRouter } from "next/navigation";
+import { GetSession } from "@/app/actions/get-session";
 
 interface NotesHeaderProps {
   viewMode: "grid" | "list";
   onViewModeChange: (mode: "grid" | "list") => void;
+  router: ReturnType<typeof useRouter>;
 }
 
-export function NotesHeader({ viewMode, onViewModeChange }: NotesHeaderProps) {
+export function NotesHeader({
+  viewMode,
+  onViewModeChange,
+  router,
+}: NotesHeaderProps) {
+  const handleCreateNote = async () => {
+    const session = await GetSession();
+    const userID = session?.user?.id as string;
+
+    if (!userID) {
+      toast.error("Please sign in to create a new note");
+      return;
+    }
+
+    const createNotePromise = async () => {
+      try {
+        const data = { author: userID };
+        const response = await createNote(data);
+
+        if (response.status !== "success") {
+          throw new Error(
+            response.message || "Failed to create note. Try again later."
+          );
+        }
+
+        return response;
+      } catch (error) {
+        throw error;
+      }
+    };
+
+    toast.promise(createNotePromise(), {
+      loading: "Creating new note...",
+      success: (response) => {
+        router.push(`/dashboard/notes/new/${response?.data?._id}`);
+        return "Note created successfully";
+      },
+      error: (error) => {
+        return error?.message;
+      },
+    });
+  };
+
   return (
     <div className="flex flex-col gap-4 pb-6">
       <div className="flex items-center justify-between">
@@ -29,11 +73,9 @@ export function NotesHeader({ viewMode, onViewModeChange }: NotesHeaderProps) {
           </p>
         </div>
 
-        <Button asChild>
-          <Link href="/dashboard/notes/new">
-            <Plus className="mr-2 h-4 w-4" />
-            New Note
-          </Link>
+        <Button onClick={handleCreateNote}>
+          <Plus className="mr-2 h-4 w-4" />
+          New Note
         </Button>
       </div>
 

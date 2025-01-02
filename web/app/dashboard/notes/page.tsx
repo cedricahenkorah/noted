@@ -2,6 +2,7 @@
 
 import { NotesGrid } from "@/components/notes/notes-grid";
 import { NotesHeader } from "@/components/notes/notes-header";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 const notes = [
@@ -57,10 +58,15 @@ const notes = [
 
 export default function NotesPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const router = useRouter();
 
   return (
     <div className="flex-1 space-y-6 p-6">
-      <NotesHeader viewMode={viewMode} onViewModeChange={setViewMode} />
+      <NotesHeader
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+        router={router}
+      />
       <NotesGrid notes={notes} view={viewMode} />
     </div>
   );
