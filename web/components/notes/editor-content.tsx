@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Tag } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -8,17 +8,67 @@ import { Input } from "@/components/ui/input";
 import "@/components/notes/editor.css";
 import { EditorToolbar } from "./editor-toolbar";
 
-export function EditorContent() {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [tags, setTags] = useState<string[]>([]);
+interface EditorState {
+  id: string;
+  title: string;
+  content: string;
+  tags: string[];
+}
+
+export function EditorContent({
+  editorRef,
+  content,
+  title,
+  setTitle,
+  tags,
+  id,
+}: {
+  editorRef: React.RefObject<HTMLDivElement | null>;
+  content: string;
+  title: string;
+  setTitle: React.Dispatch<React.SetStateAction<string>>;
+  tags: string[];
+  id: string;
+}) {
+  const [editorState, setEditorState] = useState<EditorState>(() => {
+    return { id, title, content, tags };
+  });
   const [newTag, setNewTag] = useState("");
-  const [isEmpty, setIsEmpty] = useState(true);
-  const editorRef = useRef<HTMLDivElement>(null);
+  const initialNote = { id, title, content, tags };
+  const [isEmpty, setIsEmpty] = useState(!initialNote);
+
+  useEffect(() => {
+    if (editorRef.current) {
+      editorRef.current.innerHTML = content;
+      placeCursorAtEnd();
+    }
+  }, [content]);
+
+  const placeCursorAtEnd = () => {
+    if (editorRef.current) {
+      editorRef.current.focus();
+      const range = document.createRange();
+      range.selectNodeContents(editorRef.current);
+      range.collapse(false);
+      const selection = window.getSelection();
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+    }
+  };
 
   const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && newTag.trim()) {
-      setTags([...tags, newTag.trim()]);
+      setEditorState(
+        (prevState: {
+          id: string;
+          title: string;
+          content: string;
+          tags: string[];
+        }) => ({
+          ...prevState,
+          tags: [...prevState.tags, newTag.trim()],
+        })
+      );
       setNewTag("");
     }
   };
@@ -78,15 +128,9 @@ export function EditorContent() {
                 selection.removeAllRanges();
                 selection.addRange(range);
 
-                // Trigger the onInput event to update the content state
-                const inputEvent = new Event("input", {
-                  bubbles: true,
-                  cancelable: true,
-                });
-                editorRef.current.dispatchEvent(inputEvent);
-
                 // Add resize handles
                 addResizeHandles(img);
+                updateEditorState();
               }
             };
             reader.readAsDataURL(file);
@@ -124,15 +168,12 @@ export function EditorContent() {
     range.deleteContents();
     range.insertNode(newElement);
 
-    // Move the cursor to the end of the inserted content
     range.setStartAfter(newElement);
     range.setEndAfter(newElement);
     selection.removeAllRanges();
     selection.addRange(range);
 
-    // Trigger the onInput event to update the content state
-    const inputEvent = new Event("input", { bubbles: true, cancelable: true });
-    editorRef.current.dispatchEvent(inputEvent);
+    updateEditorState();
   };
 
   const addResizeHandles = (img: HTMLImageElement) => {
@@ -158,12 +199,7 @@ export function EditorContent() {
     removeButton.onclick = (e) => {
       e.preventDefault();
       wrapper.remove();
-      // Trigger the onInput event to update the content state
-      const inputEvent = new Event("input", {
-        bubbles: true,
-        cancelable: true,
-      });
-      editorRef.current?.dispatchEvent(inputEvent);
+      updateEditorState();
     };
     wrapper.appendChild(removeButton);
   };
@@ -204,6 +240,7 @@ export function EditorContent() {
       resizedImage = null;
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
+      updateEditorState();
     };
 
     editor.addEventListener("mousedown", handleMouseDown);
@@ -213,6 +250,27 @@ export function EditorContent() {
     };
   }, []);
 
+  const updateEditorState = () => {
+    if (editorRef.current) {
+      const newContent = editorRef.current.innerHTML;
+      setEditorState(
+        (prevState: {
+          id: string;
+          title: string;
+          content: string;
+          tags: string[];
+        }) => ({
+          ...prevState,
+          content: newContent,
+        })
+      );
+      setIsEmpty(newContent.trim() === "");
+    }
+  };
+
+  const handleInput = () => {
+    updateEditorState();
+  };
   return (
     <div className="flex flex-col flex-1">
       <EditorToolbar onInsert={handleInsert} />
@@ -229,15 +287,11 @@ export function EditorContent() {
           ref={editorRef}
           contentEditable
           onKeyDown={handleKeyDown}
+          onInput={handleInput}
           className={`flex-1 min-h-[200px] outline-none whitespace-pre-wrap break-words ${
             isEmpty ? "is-empty" : ""
           }`}
           data-placeholder="Start writing, drag files or start from a template"
-          onInput={(e) => {
-            const newContent = e.currentTarget.textContent || "";
-            setContent(newContent);
-            setIsEmpty(newContent.trim() === "");
-          }}
         />
 
         <div className="flex items-center gap-4 mt-4 mb-10">
