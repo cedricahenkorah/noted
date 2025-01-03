@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export function EditorHeader() {
+export function EditorHeader({ handleSave }: { handleSave: () => void }) {
   const [notebook] = useState("First Notebook");
 
   return (
@@ -26,6 +26,10 @@ export function EditorHeader() {
         <span>Untitled</span>
       </div>
       <div className="flex items-center gap-2">
+        <Button variant="secondary" className="text-sm" onClick={handleSave}>
+          Save note
+        </Button>
+
         <Button variant="secondary" className="text-sm">
           Share note
         </Button>

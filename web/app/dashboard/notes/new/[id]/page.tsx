@@ -2,7 +2,7 @@
 
 import { EditorContent } from "@/components/notes/editor-content";
 import { EditorHeader } from "@/components/notes/editor-header";
-import { fetchNote } from "@/lib/notes";
+import { fetchNote, saveNote } from "@/lib/notes";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -36,7 +36,31 @@ export default function NewNotePage() {
     }
   }, [params.id]);
 
-  const handleSave = async () => {};
+  const handleSave = async () => {
+    const data = { id, title, content, tags };
+
+    const saveNotePromise = async () => {
+      try {
+        const response = await saveNote(data);
+
+        if (response.status !== "success") {
+          throw new Error(
+            response.message || "Failed to save note. Try again later."
+          );
+        }
+
+        return response;
+      } catch (error) {
+        throw error;
+      }
+    };
+
+    toast.promise(saveNotePromise(), {
+      loading: "Saving note...",
+      success: "Note saved successfully",
+      error: (error) => error?.message,
+    });
+  };
 
   return (
     <div className="flex flex-col h-screen bg-background">
@@ -44,9 +68,11 @@ export default function NewNotePage() {
       <EditorContent
         editorRef={editorRef}
         content={content}
+        setContent={setContent}
         title={title}
         setTitle={setTitle}
         tags={tags}
+        setTags={setTags}
         id={id}
       />
     </div>
