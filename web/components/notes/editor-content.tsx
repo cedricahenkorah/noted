@@ -8,31 +8,25 @@ import { Input } from "@/components/ui/input";
 import "@/components/notes/editor.css";
 import { EditorToolbar } from "./editor-toolbar";
 
-interface EditorState {
-  id: string;
-  title: string;
-  content: string;
-  tags: string[];
-}
-
 export function EditorContent({
   editorRef,
   content,
+  setContent,
   title,
   setTitle,
   tags,
+  setTags,
   id,
 }: {
   editorRef: React.RefObject<HTMLDivElement | null>;
   content: string;
+  setContent: React.Dispatch<React.SetStateAction<string>>;
   title: string;
   setTitle: React.Dispatch<React.SetStateAction<string>>;
   tags: string[];
+  setTags: React.Dispatch<React.SetStateAction<string[]>>;
   id: string;
 }) {
-  const [editorState, setEditorState] = useState<EditorState>(() => {
-    return { id, title, content, tags };
-  });
   const [newTag, setNewTag] = useState("");
   const initialNote = { id, title, content, tags };
   const [isEmpty, setIsEmpty] = useState(!initialNote);
@@ -58,17 +52,7 @@ export function EditorContent({
 
   const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && newTag.trim()) {
-      setEditorState(
-        (prevState: {
-          id: string;
-          title: string;
-          content: string;
-          tags: string[];
-        }) => ({
-          ...prevState,
-          tags: [...prevState.tags, newTag.trim()],
-        })
-      );
+      setTags((prevTags) => [...prevTags, newTag.trim()]);
       setNewTag("");
     }
   };
@@ -199,6 +183,7 @@ export function EditorContent({
     removeButton.onclick = (e) => {
       e.preventDefault();
       wrapper.remove();
+
       updateEditorState();
     };
     wrapper.appendChild(removeButton);
@@ -253,17 +238,7 @@ export function EditorContent({
   const updateEditorState = () => {
     if (editorRef.current) {
       const newContent = editorRef.current.innerHTML;
-      setEditorState(
-        (prevState: {
-          id: string;
-          title: string;
-          content: string;
-          tags: string[];
-        }) => ({
-          ...prevState,
-          content: newContent,
-        })
-      );
+      setContent(newContent);
       setIsEmpty(newContent.trim() === "");
     }
   };
