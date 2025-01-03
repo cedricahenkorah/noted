@@ -7,6 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import "@/components/notes/editor.css";
 import { EditorToolbar } from "./editor-toolbar";
+import { compressImage } from "@/utils/image-compression";
+import { genUploader } from "uploadthing/client";
+import type { OurFileRouter } from "@/app/api/uploadthing/core";
+
+export const { uploadFiles } = genUploader<OurFileRouter>({
+  package: "",
+});
 
 export function EditorContent({
   editorRef,
@@ -34,6 +41,30 @@ export function EditorContent({
   useEffect(() => {
     if (editorRef.current) {
       editorRef.current.innerHTML = content;
+
+      // Reapply resize handles and remove button functionality to images
+      const images = editorRef.current.querySelectorAll("img");
+      images.forEach((img) => {
+        addResizeHandles(img as HTMLImageElement);
+      });
+
+      const removeButtons = editorRef.current.querySelectorAll(
+        ".remove-image-button"
+      );
+
+      removeButtons.forEach((button) => {
+        button.addEventListener("click", (e) => {
+          e.preventDefault();
+
+          const wrapper = (button.parentElement as HTMLElement)?.closest(
+            ".image-wrapper"
+          );
+
+          wrapper?.remove();
+          updateEditorState();
+        });
+      });
+
       placeCursorAtEnd();
     }
   }, [content]);
@@ -91,11 +122,18 @@ export function EditorContent({
 
         fileInput.onchange = async () => {
           const file = fileInput.files?.[0];
+
           if (file) {
+            const compressedFile = await compressImage(file as File);
+            const uploadResponse = await uploadFiles("imageUploader", {
+              files: [compressedFile],
+            });
+
             const reader = new FileReader();
-            reader.onload = (e) => {
+            reader.onload = () => {
               const img = document.createElement("img");
-              img.src = e.target?.result as string;
+
+              img.src = uploadResponse[0].serverData.fileUrl;
               img.alt = "Uploaded image";
               img.style.width = "300px";
               img.style.height = "auto";
@@ -104,11 +142,19 @@ export function EditorContent({
               if (selection && editorRef.current) {
                 const range = selection.getRangeAt(0);
                 range.deleteContents();
+
+                // Insert the image
                 range.insertNode(img);
 
-                // Move the cursor to the end of the inserted image
+                // Create a new line element after the image
+                const newLine = document.createElement("div");
+                newLine.innerHTML = "<br>";
                 range.setStartAfter(img);
-                range.setEndAfter(img);
+                range.insertNode(newLine);
+
+                // Move cursor to the new line
+                range.setStart(newLine, 0);
+                range.setEnd(newLine, 0);
                 selection.removeAllRanges();
                 selection.addRange(range);
 
@@ -161,6 +207,11 @@ export function EditorContent({
   };
 
   const addResizeHandles = (img: HTMLImageElement) => {
+    if ((img.parentNode as HTMLElement)?.classList.contains("image-wrapper")) {
+      // Resize handles are already added
+      return;
+    }
+
     const wrapper = document.createElement("div");
     wrapper.className = "image-wrapper";
     wrapper.style.position = "relative";
@@ -238,6 +289,7 @@ export function EditorContent({
   const updateEditorState = () => {
     if (editorRef.current) {
       const newContent = editorRef.current.innerHTML;
+      console.log(newContent);
       setContent(newContent);
       setIsEmpty(newContent.trim() === "");
     }
