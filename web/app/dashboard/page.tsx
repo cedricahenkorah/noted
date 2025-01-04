@@ -13,11 +13,11 @@ export default function Dashboard() {
     let greetingMessage = "";
 
     if (currentHour >= 5 && currentHour < 12) {
-      greetingMessage = "Good morning";
+      greetingMessage = "Good morning 🌅";
     } else if (currentHour >= 12 && currentHour < 18) {
-      greetingMessage = "Good afternoon";
+      greetingMessage = "Good afternoon 🏞️";
     } else {
-      greetingMessage = "Good evening";
+      greetingMessage = "Good evening 🌃";
     }
 
     setGreeting(greetingMessage);
@@ -26,7 +26,9 @@ export default function Dashboard() {
   return (
     <div className="flex-1 space-y-6 p-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-yellow-500">
+          Dashboard
+        </h1>
         <p className="text-muted-foreground">
           {greeting}! Here&apos;s an overview of your notes.
         </p>

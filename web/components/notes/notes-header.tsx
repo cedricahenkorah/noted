@@ -67,13 +67,18 @@ export function NotesHeader({
     <div className="flex flex-col gap-4 pb-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Notes</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-yellow-500">
+            Notes
+          </h1>
           <p className="text-muted-foreground">
             Create, edit and manage your notes
           </p>
         </div>
 
-        <Button onClick={handleCreateNote}>
+        <Button
+          onClick={handleCreateNote}
+          className="bg-yellow-500 hover:bg-yellow-600"
+        >
           <Plus className="mr-2 h-4 w-4" />
           New Note
         </Button>
