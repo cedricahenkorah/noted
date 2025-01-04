@@ -1,5 +1,6 @@
 "use client";
 
+import { GetSession } from "@/app/actions/get-session";
 import { EditorContent } from "@/components/notes/editor-content";
 import { EditorHeader } from "@/components/notes/editor-header";
 import { fetchNote, saveNote } from "@/lib/notes";
@@ -14,18 +15,23 @@ export default function NewNotePage() {
   const [content, setContent] = useState("");
   const [tags, setTags] = useState<string[]>([]);
   const [id, setId] = useState<string>("");
+  const [accessToken, setAccessToken] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
   const [errorState, setErrorState] = useState<boolean>(false);
   const params = useParams<{ id: string }>();
 
   useEffect(() => {
     async function getNote() {
-      await fetchNote({ id: params.id })
+      const session = await GetSession();
+      const token = session?.user?.accessToken as string;
+
+      await fetchNote({ id: params.id, accessToken: token })
         .then((response) => {
           setTitle(response?.data?.title ?? "");
           setContent(response?.data?.content ?? "");
           setTags(response?.data?.tags ?? []);
           setId(response?.data?._id ?? "");
+          setAccessToken(token);
           setLoading(false);
           setErrorState(false);
         })
@@ -33,6 +39,8 @@ export default function NewNotePage() {
           if (error instanceof Error) {
             toast.error(error.message);
           }
+
+          setLoading(false);
           setErrorState(true);
         });
     }
@@ -43,7 +51,7 @@ export default function NewNotePage() {
   }, [params.id]);
 
   const handleSave = async () => {
-    const data = { id, title, content, tags };
+    const data = { id, title, content, tags, accessToken };
 
     const saveNotePromise = async () => {
       try {

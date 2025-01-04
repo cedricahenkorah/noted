@@ -2,13 +2,17 @@ import axios from "axios";
 
 const uri = process.env.NEXT_PUBLIC_SERVER_URL;
 
-export async function createNote(data: { author: string }) {
+export async function createNote(data: { accessToken: string }) {
   try {
-    const response = await axios.post(`${uri}/api/notes/`, data, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await axios.post(
+      `${uri}/api/notes/`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${data.accessToken}`,
+        },
+      }
+    );
 
     if (response.data.status !== "success") {
       throw new Error(
@@ -32,13 +36,25 @@ export async function saveNote(data: {
   title: string;
   content: string;
   tags: string[];
+  accessToken: string;
 }) {
   try {
-    const response = await axios.patch(`${uri}/api/notes/${data.id}`, data, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const noteData = {
+      title: data.title,
+      content: data.content,
+      tags: data.tags,
+    };
+
+    const response = await axios.patch(
+      `${uri}/api/notes/${data.id}`,
+      noteData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${data.accessToken}`,
+        },
+      }
+    );
 
     if (response.data.status !== "success") {
       throw new Error(
@@ -56,9 +72,13 @@ export async function saveNote(data: {
   }
 }
 
-export async function fetchNote(data: { id: string }) {
+export async function fetchNote(data: { id: string; accessToken: string }) {
   try {
-    const response = await axios.get(`${uri}/api/notes/${data.id}`);
+    const response = await axios.get(`${uri}/api/notes/${data.id}`, {
+      headers: {
+        Authorization: `Bearer ${data.accessToken}`,
+      },
+    });
 
     if (response.data.status !== "success") {
       throw new Error(

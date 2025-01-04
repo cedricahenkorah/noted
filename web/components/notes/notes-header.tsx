@@ -27,16 +27,16 @@ export function NotesHeader({
 }: NotesHeaderProps) {
   const handleCreateNote = async () => {
     const session = await GetSession();
-    const userID = session?.user?.id as string;
+    const accessToken = session?.user?.accessToken as string;
 
-    if (!userID) {
+    if (!accessToken) {
       toast.error("Please sign in to create a new note");
       return;
     }
 
     const createNotePromise = async () => {
       try {
-        const data = { author: userID };
+        const data = { accessToken };
         const response = await createNote(data);
 
         if (response.status !== "success") {
