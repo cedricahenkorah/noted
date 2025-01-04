@@ -133,3 +133,64 @@ export async function getNote(req: Request, res: Response) {
     return;
   }
 }
+
+export async function getNotes(req: Request, res: Response) {
+  const user: { id: string; email: string; name: string } = req.body.user;
+  const page: number = parseInt(req.query.page as string) || 1;
+  const perPage: number = 10;
+
+  logger.info(
+    `[note.controller.ts] [getNotes] Fetching notes for user: ${user.email}`
+  );
+
+  try {
+    if (!user) {
+      logger.error(`[note.controller.ts] [getNotes] User not found`);
+      errorResponse(res, 404, "User not found");
+      return;
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(user.id)) {
+      logger.error(
+        `[note.controller.ts] [getNotes] Invalid user ID: ${user.id}`
+      );
+      errorResponse(res, 400, "Invalid user ID");
+      return;
+    }
+
+    const notes = await Note.find({ author: user.id })
+      .sort({ updatedAt: -1 })
+      .skip((page - 1) * perPage)
+      .limit(perPage)
+      .lean()
+      .exec();
+
+    if (!notes) {
+      logger.error(
+        `[note.controller.ts] [getNotes] Could not fetch notes for the user: ${user.email}`
+      );
+      errorResponse(res, 404, "No notes found");
+      return;
+    }
+
+    if (notes && notes.length === 0) {
+      logger.info(
+        `[note.controller.ts] [getNotes] Notes fetched successfully but no notes found for the user: ${user.email}`
+      );
+      successResponse(res, 200, "Notes fetched successfully", notes);
+      return;
+    }
+
+    logger.info(
+      `[note.controller.ts] [getNotes] Notes fetched successfully for user: ${user.email}`
+    );
+    successResponse(res, 200, "Notes fetched successfully", notes);
+    return;
+  } catch (error) {
+    logger.error(
+      `[note.controller.ts] [getNotes] Internal Server Error ${error}`
+    );
+    errorResponse(res, 500, "Internal Server Error");
+    return;
+  }
+}
