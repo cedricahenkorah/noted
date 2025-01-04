@@ -66,11 +66,6 @@ export function NoteCard({ note, view }: NoteCardProps) {
             </DropdownMenu>
           </div>
         </CardHeader>
-        {/* <CardContent>
-          <p className="text-sm text-muted-foreground line-clamp-2">
-            {note.excerpt}
-          </p>
-        </CardContent> */}
         <CardFooter>
           <div className="flex flex-wrap gap-2">
             {note.tags.length > 0 ? (
