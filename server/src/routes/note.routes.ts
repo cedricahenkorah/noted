@@ -10,7 +10,7 @@ import { verifyJWT } from "../middlewares/verify-jwt";
 const noteRoutes = express.Router();
 
 noteRoutes.get("/", verifyJWT, getNotes);
-noteRoutes.post("/", createNote);
+noteRoutes.post("/", verifyJWT, createNote);
 noteRoutes.patch("/:id", saveNote);
 noteRoutes.get("/:id", getNote);
 
