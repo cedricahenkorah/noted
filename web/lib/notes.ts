@@ -96,11 +96,14 @@ export async function fetchNote(data: { id: string; accessToken: string }) {
   }
 }
 
-export async function fetchNotes(data: { accessToken: string }) {
+export async function fetchNotes(data: { accessToken: string; page: number }) {
   try {
     const response = await axios.get(`${uri}/api/notes`, {
       headers: {
         Authorization: `Bearer ${data.accessToken}`,
+      },
+      params: {
+        page: data.page,
       },
     });
 
