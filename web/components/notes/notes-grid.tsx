@@ -2,9 +2,9 @@ import { NoteCard } from "./note-card";
 
 interface NotesGridProps {
   notes: Array<{
-    id: string;
+    _id: string;
     title: string;
-    excerpt: string;
+    content: string;
     updatedAt: Date;
     tags: string[];
   }>;
@@ -21,7 +21,7 @@ export function NotesGrid({ notes, view }: NotesGridProps) {
       }
     >
       {notes.map((note) => (
-        <NoteCard key={note.id} note={note} view={view} />
+        <NoteCard key={note._id} note={note} view={view} />
       ))}
     </div>
   );

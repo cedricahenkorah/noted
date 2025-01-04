@@ -95,3 +95,28 @@ export async function fetchNote(data: { id: string; accessToken: string }) {
     }
   }
 }
+
+export async function fetchNotes(data: { accessToken: string }) {
+  try {
+    const response = await axios.get(`${uri}/api/notes`, {
+      headers: {
+        Authorization: `Bearer ${data.accessToken}`,
+      },
+    });
+
+    if (response.data.status !== "success") {
+      throw new Error(
+        response.data.message || "Failed to fetch notes. Try again later"
+      );
+    }
+
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(
+        error.response?.data?.message ||
+          "Failed to fetch notes. Try again later"
+      );
+    }
+  }
+}
