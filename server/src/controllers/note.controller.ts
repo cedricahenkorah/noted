@@ -188,7 +188,7 @@ export async function getNote(req: Request, res: Response) {
 export async function getNotes(req: Request, res: Response) {
   const user: { id: string; email: string; name: string } = req.body.user;
   const page: number = parseInt(req.query.page as string) || 1;
-  const perPage: number = 10;
+  const perPage: number = parseInt(req.query.limit as string) || 10;
 
   logger.info(
     `[note.controller.ts] [getNotes] Fetching notes for user: ${user.email}`

@@ -96,7 +96,11 @@ export async function fetchNote(data: { id: string; accessToken: string }) {
   }
 }
 
-export async function fetchNotes(data: { accessToken: string; page: number }) {
+export async function fetchNotes(data: {
+  accessToken: string;
+  page: number;
+  limit?: number;
+}) {
   try {
     const response = await axios.get(`${uri}/api/notes`, {
       headers: {
@@ -104,6 +108,7 @@ export async function fetchNotes(data: { accessToken: string; page: number }) {
       },
       params: {
         page: data.page,
+        limit: data?.limit,
       },
     });
 
