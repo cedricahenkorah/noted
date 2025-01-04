@@ -6,10 +6,10 @@ import { NotesHeader } from "@/components/notes/notes-header";
 import { fetchNotes } from "@/lib/notes";
 import { ChevronDown, NotebookText } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-interface Note {
+export interface Note {
   _id: string;
   title: string;
   content: string;
@@ -25,29 +25,40 @@ export default function NotesPage() {
   const [hasMore, setHasMore] = useState(true);
   const router = useRouter();
 
-  useEffect(() => {
-    async function getNotes() {
-      const session = await GetSession();
-      const token = session?.user?.accessToken as string;
+  const hasFetchedRef = useRef(false);
 
-      setLoading(true);
+  const getNotes = useCallback(async () => {
+    const session = await GetSession();
+    const token = session?.user?.accessToken as string;
 
-      await fetchNotes({ accessToken: token, page: currentPage })
-        .then((response) => {
-          setNotes((prevNotes) => [...prevNotes, ...response.data]);
-          setHasMore(response.data.length > 0);
-          setLoading(false);
-        })
-        .catch((error) => {
-          if (error instanceof Error) {
-            toast.error(error.message);
-          }
-        })
-        .finally(() => setLoading(false));
-    }
+    setLoading(true);
 
-    getNotes();
+    await fetchNotes({ accessToken: token, page: currentPage, limit: 9 })
+      .then((response) => {
+        setNotes((prevNotes) => [...prevNotes, ...response.data]);
+        setHasMore(response.data.length > 0);
+        setLoading(false);
+      })
+      .catch((error) => {
+        if (error instanceof Error) {
+          toast.error(error.message);
+        }
+      })
+      .finally(() => setLoading(false));
   }, [currentPage]);
+
+  useEffect(() => {
+    if (!hasFetchedRef.current) {
+      getNotes();
+      hasFetchedRef.current = true;
+    }
+  }, [getNotes]);
+
+  useEffect(() => {
+    if (hasFetchedRef.current && currentPage > 1) {
+      getNotes();
+    }
+  }, [currentPage, getNotes]);
 
   const handleShowMore = () => {
     setCurrentPage((prevPage) => prevPage + 1);
