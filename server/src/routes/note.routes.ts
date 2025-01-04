@@ -9,8 +9,9 @@ import { verifyJWT } from "../middlewares/verify-jwt";
 
 const noteRoutes = express.Router();
 
-noteRoutes.get("/", verifyJWT, getNotes);
-noteRoutes.post("/", verifyJWT, createNote);
+noteRoutes.use(verifyJWT);
+noteRoutes.get("/", getNotes);
+noteRoutes.post("/", createNote);
 noteRoutes.patch("/:id", saveNote);
 noteRoutes.get("/:id", getNote);
 
