@@ -16,7 +16,7 @@ export function QuickActions() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Quick Actions</CardTitle>
+        <CardTitle className="text-yellow-500">Quick Actions</CardTitle>
         <CardDescription>Create new content or start recording</CardDescription>
       </CardHeader>
 
