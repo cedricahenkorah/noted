@@ -6,6 +6,12 @@ import axios from "axios";
 
 const uri = process.env.NEXT_PUBLIC_SERVER_URL;
 
+declare module "next-auth" {
+  interface User {
+    accessToken?: string;
+  }
+}
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({
@@ -36,6 +42,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             name: response?.data?.data?.user?.name,
             email: response?.data?.data?.user?.email,
             image: response?.data?.data?.user?.displayPhoto,
+            accessToken: response?.data?.data?.accessToken,
           };
 
           return user;
@@ -60,6 +67,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     signIn: "/auth/",
   },
 
+  session: {
+    strategy: "jwt",
+    maxAge: 3 * 24 * 60 * 60, // 3 days
+  },
+
   callbacks: {
     authorized: async ({ auth }) => {
       // Logged in users are authenticated, otherwise redirect to login page
@@ -69,11 +81,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (user) {
         // User is available during sign-in
         token.id = user.id;
+        token.accessToken = user.accessToken;
       }
       return token;
     },
     session({ session, token }) {
       session.user.id = token.id as string;
+      session.user.accessToken = token.accessToken as string;
       return session;
     },
   },
