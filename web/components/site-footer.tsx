@@ -28,8 +28,10 @@ export function SiteFooter() {
       <div className="container mx-auto grid gap-8 py-16 md:grid-cols-2 lg:grid-cols-4 px-5 lg:px-0">
         <div className="space-y-4">
           <Link href="/" className="flex items-center space-x-2">
-            <NotebookText className="h-6 w-6" />
-            <span className="font-bold">noted</span>
+            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-yellow-500 text-primary-foreground">
+              <NotebookText className="h-6 w-6" />
+            </div>
+            <span className="font-bold text-yellow-500">noted</span>
           </Link>
           <p className="text-sm text-muted-foreground">
             The modern note-taking app for capturing your ideas through text,
@@ -92,10 +94,10 @@ export function SiteFooter() {
           <p>
             Crafted by{" "}
             <Link
-              href="https://github.com/cedricahenkorah/noted"
+              href="https://github.com/cedricahenkorah/"
               className="font-medium underline underline-offset-4"
             >
-              @noted
+              @cedricahenkorah
             </Link>
           </p>
         </div>

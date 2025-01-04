@@ -81,7 +81,7 @@ export default function NewNotePage() {
       <div className="flex-1 flex-col items-center justify-center bg-background">
         <div className="flex h-full justify-center items-center">
           <div className="flex items-center gap-2 self-center font-medium">
-            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
+            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-yellow-500 text-primary-foreground">
               <NotebookText className="size-4" />
             </div>
             Loading note...
@@ -96,7 +96,7 @@ export default function NewNotePage() {
       <div className="flex-1 flex-col items-center justify-center bg-background">
         <div className="flex h-full justify-center items-center">
           <div className="flex items-center gap-2 self-center font-medium">
-            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
+            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-yellow-500 text-primary-foreground">
               <NotebookText className="size-4" />
             </div>
             Error loading note. Try again later.

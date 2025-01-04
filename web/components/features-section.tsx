@@ -31,7 +31,7 @@ export function FeaturesSection() {
       className="container mx-auto space-y-16 py-24 md:py-32 lg:py-40 px-5 lg:px-0"
     >
       <div className="mx-auto text-center md:max-w-[58rem]">
-        <h2 className="text-3xl font-bold leading-tight tracking-tighter md:text-5xl lg:leading-[1.1]">
+        <h2 className="text-3xl font-bold leading-tight tracking-tighter md:text-5xl lg:leading-[1.1] text-yellow-500">
           Powerful features for every thought
         </h2>
         <p className="mt-4 text-muted-foreground md:text-xl">
@@ -50,7 +50,7 @@ export function FeaturesSection() {
             viewport={{ once: false }}
             className="relative overflow-hidden rounded-lg border bg-background p-6"
           >
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg border bg-muted">
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg border bg-yellow-500">
               <feature.icon className="h-6 w-6" />
             </div>
             <h3 className="mt-4 text-xl font-bold">{feature.title}</h3>

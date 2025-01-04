@@ -16,7 +16,7 @@ export function CTASection() {
           viewport={{ once: false }}
           className="mx-auto max-w-3xl text-center"
         >
-          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-yellow-500">
             Ready to amplify your productivity?
           </h2>
           <p className="mt-4 text-muted-foreground md:text-xl">
@@ -24,7 +24,11 @@ export function CTASection() {
             their ideas.
           </p>
           <div className="mt-8 flex flex-col gap-4 min-[400px]:flex-row justify-center">
-            <Button size="lg" asChild>
+            <Button
+              size="lg"
+              asChild
+              className="bg-yellow-500 hover:bg-yellow-600"
+            >
               <Link href="/register">Get started for free</Link>
             </Button>
             <Button size="lg" variant="outline" asChild>

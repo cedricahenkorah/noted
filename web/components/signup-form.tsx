@@ -70,7 +70,7 @@ export function SignUpForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Get Started</CardTitle>
+          <CardTitle className="text-xl text-yellow-500">Get Started</CardTitle>
           <CardDescription>Sign up with your Google account</CardDescription>
         </CardHeader>
         <CardContent>
@@ -129,7 +129,10 @@ export function SignUpForm({
                   />
                 </div>
 
-                <Button type="submit" className="w-full">
+                <Button
+                  type="submit"
+                  className="w-full bg-yellow-500 hover:bg-yellow-600"
+                >
                   Sign Up
                 </Button>
               </div>

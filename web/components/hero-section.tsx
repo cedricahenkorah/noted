@@ -18,9 +18,9 @@ export function HeroSection() {
             transition={{ duration: 0.5 }}
             className="space-y-6"
           >
-            <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl">
+            <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl text-yellow-500">
               Your thoughts,{" "}
-              <span className="bg-gradient-to-r from-primary to-primary/50 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-yellow-500 to-yellow-500/50 bg-clip-text text-transparent">
                 amplified
               </span>
             </h1>
@@ -37,7 +37,11 @@ export function HeroSection() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="flex flex-col gap-4 min-[400px]:flex-row"
           >
-            <Button size="lg" asChild>
+            <Button
+              size="lg"
+              asChild
+              className="bg-yellow-500 hover:bg-yellow-600"
+            >
               <Link href="/auth/sign-up">Start for free</Link>
             </Button>
             <Button size="lg" variant="outline" asChild>
@@ -52,17 +56,17 @@ export function HeroSection() {
             className="flex justify-center gap-4 lg:gap-8"
           >
             <div className="flex items-center space-x-2">
-              <Pencil className="h-4 w-4 text-primary" />
+              <Pencil className="h-4 w-4 text-yellow-500" />
               <span className="text-sm">Text Notes</span>
             </div>
 
             <div className="flex items-center space-x-2">
-              <Mic className="h-4 w-4 text-primary" />
+              <Mic className="h-4 w-4 text-yellow-500" />
               <span className="text-sm">Voice Recording</span>
             </div>
 
             <div className="flex items-center space-x-2">
-              <PenTool className="h-4 w-4 text-primary" />
+              <PenTool className="h-4 w-4 text-yellow-500" />
               <span className="text-sm">Canvas Drawing</span>
             </div>
           </motion.div>

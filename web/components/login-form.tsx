@@ -47,7 +47,9 @@ export function LoginForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Welcome back</CardTitle>
+          <CardTitle className="text-xl text-yellow-500">
+            Welcome back
+          </CardTitle>
           <CardDescription>Login with your Google account</CardDescription>
         </CardHeader>
         <CardContent>
@@ -105,7 +107,10 @@ export function LoginForm({
                   />
                 </div>
 
-                <Button type="submit" className="w-full">
+                <Button
+                  type="submit"
+                  className="w-full bg-yellow-500 hover:bg-yellow-600"
+                >
                   Login
                 </Button>
               </div>
