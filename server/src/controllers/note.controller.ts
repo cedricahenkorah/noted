@@ -6,34 +6,47 @@ import Note from "../models/note.model";
 import mongoose from "mongoose";
 
 export async function createNote(req: Request, res: Response) {
-  const { author } = req.body;
+  const user: { id: string; email: string; name: string } = req.body.user;
 
   logger.info(
-    `[note.controller.ts] [createNote] User: ${author} creating a new note`
+    `[note.controller.ts] [createNote] User: ${user.email} creating a new note`
   );
 
   try {
-    if (!author) {
-      logger.error(`[note.controller.ts] [createNote] Author is required`);
-      errorResponse(res, 400, "Author is required");
-      return;
-    }
-
-    const user = await User.findById(author).select("-password").lean().exec();
-
     if (!user) {
       logger.error(
-        `[note.controller.ts] [createNote] User: ${author} not found`
+        `[note.controller.ts] [createNote] Unauthorized access, user not found`
       );
-      errorResponse(res, 400, "User not found");
+      errorResponse(res, 401, "Unauthorized access");
       return;
     }
 
-    const note = await Note.create({ author });
+    if (!mongoose.Types.ObjectId.isValid(user.id)) {
+      logger.error(
+        `[note.controller.ts] [getNotes] Unauthorized access, Invalid user ID: ${user.id}`
+      );
+      errorResponse(res, 401, "Unauthorized access");
+      return;
+    }
+
+    const userExists = await User.findById(user.id)
+      .select("-password")
+      .lean()
+      .exec();
+
+    if (!userExists) {
+      logger.error(
+        `[note.controller.ts] [createNote] User does not exist: ${user.email}`
+      );
+      errorResponse(res, 400, "User does not exist");
+      return;
+    }
+
+    const note = await Note.create({ author: user.id });
 
     if (!note) {
       logger.error(
-        `[note.controller.ts] [createNote] User: ${author} failed to create note`
+        `[note.controller.ts] [createNote] User: ${user.email} failed to create note`
       );
       errorResponse(res, 400, "Failed to create note");
       return;
@@ -54,15 +67,34 @@ export async function createNote(req: Request, res: Response) {
 }
 
 export async function saveNote(req: Request, res: Response) {
+  const user: { id: string; email: string; name: string } = req.body.user;
   const { id } = req.params;
   const { title, content, tags } = req.body;
 
-  logger.info(`[note.controller.ts] [saveNote] Saving note: ${id}`);
+  logger.info(
+    `[note.controller.ts] [saveNote] Saving note: ${id} for user: ${user.email}`
+  );
 
   try {
+    if (!user) {
+      logger.error(
+        `[note.controller.ts] [saveNote] Unauthorized access to note: ${id}`
+      );
+      errorResponse(res, 401, "Unauthorized access");
+      return;
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(user.id)) {
+      logger.error(
+        `[note.controller.ts] [saveNote] Invalid user ID: ${user.id}`
+      );
+      errorResponse(res, 401, "Unauthorized access");
+      return;
+    }
+
     if (!title || !content) {
       logger.error(
-        `[note.controller.ts] [saveNote] Title and Content are required`
+        `[note.controller.ts] [saveNote] Note: ${id} is missing required fields`
       );
       errorResponse(res, 400, "Missing required fields");
       return;
@@ -70,7 +102,7 @@ export async function saveNote(req: Request, res: Response) {
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       logger.error(`[note.controller.ts] [saveNote] Invalid note id: ${id}`);
-      errorResponse(res, 400, "Invalid note id");
+      errorResponse(res, 400, "Invalid note ID");
     }
 
     const note = await Note.findByIdAndUpdate(
@@ -104,11 +136,30 @@ export async function saveNote(req: Request, res: Response) {
 }
 
 export async function getNote(req: Request, res: Response) {
+  const user: { id: string; email: string; name: string } = req.body.user;
   const { id } = req.params;
 
-  logger.info(`[note.controller.ts] [getNote] Fetching note: ${id}`);
+  logger.info(
+    `[note.controller.ts] [getNote] Fetching note: ${id} for user: ${user.email}`
+  );
 
   try {
+    if (!user) {
+      logger.error(
+        `[note.controller.ts] [getNote] Unauthorized access to note: ${id}`
+      );
+      errorResponse(res, 401, "Unauthorized access");
+      return;
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(user.id)) {
+      logger.error(
+        `[note.controller.ts] [getNote] Invalid user ID: ${user.id}`
+      );
+      errorResponse(res, 401, "Unauthorized access");
+      return;
+    }
+
     if (!mongoose.Types.ObjectId.isValid(id)) {
       logger.error(`[note.controller.ts] [getNote] Invalid note ID: ${id}`);
       errorResponse(res, 400, "Invalid note ID");
@@ -145,16 +196,28 @@ export async function getNotes(req: Request, res: Response) {
 
   try {
     if (!user) {
-      logger.error(`[note.controller.ts] [getNotes] User not found`);
-      errorResponse(res, 404, "User not found");
+      logger.error(
+        `[note.controller.ts] [getNotes] Unauthorized access, user not found`
+      );
+      errorResponse(res, 401, "Unauthorized access");
       return;
     }
 
     if (!mongoose.Types.ObjectId.isValid(user.id)) {
       logger.error(
-        `[note.controller.ts] [getNotes] Invalid user ID: ${user.id}`
+        `[note.controller.ts] [getNotes] Unauthorized access, Invalid user ID: ${user.id}`
       );
-      errorResponse(res, 400, "Invalid user ID");
+      errorResponse(res, 401, "Unauthorized access");
+      return;
+    }
+
+    const userExists = await User.findById(user.id).lean().exec();
+
+    if (!userExists) {
+      logger.error(
+        `[note.controller.ts] [getNotes] User does not exist: ${user.email}`
+      );
+      errorResponse(res, 404, "User does not exist");
       return;
     }
 
