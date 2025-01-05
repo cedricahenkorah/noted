@@ -57,6 +57,7 @@ export async function createNote(req: Request, res: Response) {
     );
 
     successResponse(res, 201, "Note created successfully", note);
+    return;
   } catch (error) {
     logger.error(
       `[note.controller.ts] [createNote] Internal Server Error ${error}`
@@ -103,6 +104,7 @@ export async function saveNote(req: Request, res: Response) {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       logger.error(`[note.controller.ts] [saveNote] Invalid note id: ${id}`);
       errorResponse(res, 400, "Invalid note ID");
+      return;
     }
 
     const note = await Note.findByIdAndUpdate(
@@ -163,6 +165,7 @@ export async function getNote(req: Request, res: Response) {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       logger.error(`[note.controller.ts] [getNote] Invalid note ID: ${id}`);
       errorResponse(res, 400, "Invalid note ID");
+      return;
     }
 
     const note = await Note.findById(id).lean().exec();
@@ -170,12 +173,14 @@ export async function getNote(req: Request, res: Response) {
     if (!note) {
       logger.error(`[note.controller.ts] [getNote] Could not find note: ${id}`);
       errorResponse(res, 404, "The note does not exist");
+      return;
     }
 
     logger.info(
       `[note.controller.ts] [getNote] Note: ${note?._id} fetched successfully`
     );
     successResponse(res, 200, "Note fetched successfully", note);
+    return;
   } catch (error) {
     logger.error(
       `[note.controller.ts] [getNote] Internal Server Error ${error}`
@@ -252,6 +257,61 @@ export async function getNotes(req: Request, res: Response) {
   } catch (error) {
     logger.error(
       `[note.controller.ts] [getNotes] Internal Server Error ${error}`
+    );
+    errorResponse(res, 500, "Internal Server Error");
+    return;
+  }
+}
+
+export async function deleteNote(req: Request, res: Response) {
+  const user: { id: string; email: string; name: string } = req.body.user;
+  const { id } = req.params;
+
+  logger.info(
+    `[note.controller.ts] [deleteNote] Deleting note: ${id} for user: ${user.email}`
+  );
+
+  try {
+    if (!user) {
+      logger.error(
+        `[note.controller.ts] [deleteNote] Unauthorized access to note: ${id}`
+      );
+      errorResponse(res, 401, "Unauthorized access");
+      return;
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(user.id)) {
+      logger.error(
+        `[note.controller.ts] [deleteNote] Invalid user ID: ${user.id}`
+      );
+      errorResponse(res, 401, "Unauthorized access");
+      return;
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      logger.error(`[note.controller.ts] [deleteNote] Invalid note id: ${id}`);
+      errorResponse(res, 400, "Invalid note ID");
+      return;
+    }
+
+    const noteDeleted = await Note.findByIdAndDelete(id);
+
+    if (!noteDeleted) {
+      logger.error(
+        `[note.controller.ts] [deleteNote] Could not save the note: ${id}`
+      );
+      errorResponse(res, 400, "Could not delete the note");
+      return;
+    }
+
+    logger.info(
+      `[note.controller.ts] [deleteNote] Note: ${noteDeleted._id} deleted successfully`
+    );
+    successResponse(res, 200, "Note deleted successfully");
+    return;
+  } catch (error) {
+    logger.error(
+      `[note.controller.ts] [deleteNote] Internal Server Error ${error}`
     );
     errorResponse(res, 500, "Internal Server Error");
     return;

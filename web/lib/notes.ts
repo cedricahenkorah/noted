@@ -128,3 +128,28 @@ export async function fetchNotes(data: {
     }
   }
 }
+
+export async function deleteNote(data: { id: string; accessToken: string }) {
+  try {
+    const response = await axios.delete(`${uri}/api/notes/${data.id}`, {
+      headers: {
+        Authorization: `Bearer ${data.accessToken}`,
+      },
+    });
+
+    if (response.data.status !== "success") {
+      throw new Error(
+        response.data.message || "Failed to delete note. Try again later"
+      );
+    }
+
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(
+        error.response?.data?.message ||
+          "Failed to delete note. Try again later"
+      );
+    }
+  }
+}

@@ -1,6 +1,7 @@
 import express from "express";
 import {
   createNote,
+  deleteNote,
   getNote,
   getNotes,
   saveNote,
@@ -14,5 +15,6 @@ noteRoutes.get("/", getNotes);
 noteRoutes.post("/", createNote);
 noteRoutes.patch("/:id", saveNote);
 noteRoutes.get("/:id", getNote);
+noteRoutes.delete("/:id", deleteNote);
 
 export default noteRoutes;

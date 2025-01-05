@@ -1,3 +1,5 @@
+"use client";
+
 import { formatDistanceToNow } from "date-fns";
 import { FileText, MoreVertical, Pencil } from "lucide-react";
 import Link from "next/link";
@@ -11,6 +13,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { GetSession } from "@/app/actions/get-session";
+import { toast } from "sonner";
+import { deleteNote } from "@/lib/notes";
 
 interface NoteCardProps {
   note: {
@@ -24,6 +29,43 @@ interface NoteCardProps {
 }
 
 export function NoteCard({ note, view }: NoteCardProps) {
+  const handleDeleteNote = async (id: string) => {
+    const session = await GetSession();
+    const accessToken = session?.user?.accessToken as string;
+
+    if (!accessToken) {
+      toast.error("Please sign in to delete a new note");
+      return;
+    }
+
+    const deleteNotePromise = async () => {
+      try {
+        const data = { id, accessToken };
+        const response = await deleteNote(data);
+
+        if (response.status !== "success") {
+          throw new Error(
+            response.message || "Failed to delete note. Try again later."
+          );
+        }
+
+        return response;
+      } catch (error) {
+        throw error;
+      }
+    };
+
+    toast.promise(deleteNotePromise(), {
+      loading: "Deleting this note...",
+      success: () => {
+        return "Note deleted successfully";
+      },
+      error: (error) => {
+        return error?.message;
+      },
+    });
+  };
+
   return (
     <Card className={view === "list" ? "flex" : ""}>
       <div className={view === "list" ? "flex-1" : ""}>
@@ -36,6 +78,7 @@ export function NoteCard({ note, view }: NoteCardProps) {
               >
                 {note.title || "Untitled"}
               </Link>
+
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <FileText className="h-4 w-4" />
                 <span>
@@ -44,6 +87,7 @@ export function NoteCard({ note, view }: NoteCardProps) {
                 </span>
               </div>
             </div>
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon">
@@ -51,21 +95,30 @@ export function NoteCard({ note, view }: NoteCardProps) {
                   <span className="sr-only">Open menu</span>
                 </Button>
               </DropdownMenuTrigger>
+
               <DropdownMenuContent align="end">
                 <DropdownMenuItem>
                   <Pencil className="mr-2 h-4 w-4" />
                   Edit
                 </DropdownMenuItem>
+
                 <DropdownMenuItem>Share</DropdownMenuItem>
+
                 <DropdownMenuItem>Add to notebook</DropdownMenuItem>
+
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-destructive">
+
+                <DropdownMenuItem
+                  className="text-destructive"
+                  onClick={() => handleDeleteNote(note._id)}
+                >
                   Delete
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </CardHeader>
+
         <CardFooter>
           <div className="flex flex-wrap gap-2">
             {note.tags.length > 0 ? (
