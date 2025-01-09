@@ -3,10 +3,12 @@
 import { QuickActions } from "@/components/quick-actions";
 import { RecentNotes } from "@/components/recent-notes";
 import { StatsCards } from "@/components/stats-card";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function Dashboard() {
   const [greeting, setGreeting] = useState<string>("");
+  const router = useRouter();
 
   useEffect(() => {
     const currentHour = new Date().getHours();
@@ -34,7 +36,7 @@ export default function Dashboard() {
         </p>
       </div>
       <StatsCards />
-      <QuickActions />
+      <QuickActions router={router} />
       <RecentNotes />
     </div>
   );
