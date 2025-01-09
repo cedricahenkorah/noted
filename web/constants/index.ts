@@ -8,6 +8,7 @@ import {
   Trash,
   Archive,
   Star,
+  Mic,
 } from "lucide-react";
 
 export const sideMenuItems = [
@@ -25,6 +26,11 @@ export const sideMenuItems = [
     title: "Notebooks",
     url: "#",
     icon: Notebook,
+  },
+  {
+    title: "Voice Notes",
+    url: "/dashboard/audios/",
+    icon: Mic,
   },
   {
     title: "Templates",
