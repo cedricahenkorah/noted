@@ -14,6 +14,16 @@ export const ourFileRouter = {
       maxFileSize: "4MB",
       maxFileCount: 1,
     },
+
+    blob: {
+      maxFileSize: "16MB",
+      maxFileCount: 1,
+    },
+
+    "audio/webm": {
+      maxFileSize: "16MB",
+      maxFileCount: 1,
+    },
   }).onUploadComplete(async ({ file }) => {
     // This code RUNS ON YOUR SERVER after upload
 
