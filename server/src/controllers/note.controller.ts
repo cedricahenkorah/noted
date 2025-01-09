@@ -23,7 +23,7 @@ export async function createNote(req: Request, res: Response) {
 
     if (!mongoose.Types.ObjectId.isValid(user.id)) {
       logger.error(
-        `[note.controller.ts] [getNotes] Unauthorized access, Invalid user ID: ${user.id}`
+        `[note.controller.ts] [createNote] Unauthorized access, Invalid user ID: ${user.id}`
       );
       errorResponse(res, 401, "Unauthorized access");
       return;
