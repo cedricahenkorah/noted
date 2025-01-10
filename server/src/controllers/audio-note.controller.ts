@@ -6,43 +6,14 @@ import User from "../models/user.model";
 import AudioNote from "../models/audio-note.model";
 
 export async function createAudioNote(req: Request, res: Response) {
-  const user: { id: string; email: string; name: string } = req.body.user;
+  const user: { _id: string; email: string; name: string } = req.body.user;
 
   logger.info(
     `[audio-note.controller.ts] [createAudioNote] User: ${user.email} is creating an audio note`
   );
 
   try {
-    if (!user) {
-      logger.error(
-        `[audio-note.controller.ts] [createAudioNote] Unauthorized access, user not found`
-      );
-      errorResponse(res, 401, "Unauthorized access");
-      return;
-    }
-
-    if (!mongoose.Types.ObjectId.isValid(user.id)) {
-      logger.error(
-        `[audio-note.controller.ts] [createAudioNote] Unauthorized access, Invalid user ID: ${user.id}`
-      );
-      errorResponse(res, 401, "Unauthorized access");
-      return;
-    }
-
-    const userExists = await User.findById(user.id)
-      .select("-password")
-      .lean()
-      .exec();
-
-    if (!userExists) {
-      logger.error(
-        `[audio-note.controller.ts] [createAudioNote] User does not exist: ${user.email}`
-      );
-      errorResponse(res, 400, "User does not exist");
-      return;
-    }
-
-    const audioNote = await AudioNote.create({ author: user.id });
+    const audioNote = await AudioNote.create({ author: user._id });
 
     if (!audioNote) {
       logger.error(
@@ -68,7 +39,7 @@ export async function createAudioNote(req: Request, res: Response) {
 }
 
 export async function saveAudioNote(req: Request, res: Response) {
-  const user: { id: string; email: string; name: string } = req.body.user;
+  const user: { _id: string; email: string; name: string } = req.body.user;
   const { id } = req.params;
   const { title, url, recordingTime } = req.body;
 
@@ -77,35 +48,6 @@ export async function saveAudioNote(req: Request, res: Response) {
   );
 
   try {
-    if (!user) {
-      logger.error(
-        `[audio-note.controller.ts] [saveAudioNote] Unauthorized access, user not found`
-      );
-      errorResponse(res, 401, "Unauthorized access");
-      return;
-    }
-
-    if (!mongoose.Types.ObjectId.isValid(user.id)) {
-      logger.error(
-        `[audio-note.controller.ts] [saveAudioNote] Unauthorized access, Invalid user ID: ${user.id}`
-      );
-      errorResponse(res, 401, "Unauthorized access");
-      return;
-    }
-
-    const userExists = await User.findById(user.id)
-      .select("-password")
-      .lean()
-      .exec();
-
-    if (!userExists) {
-      logger.error(
-        `[audio-note.controller.ts] [saveAudioNote] User does not exist: ${user.email}`
-      );
-      errorResponse(res, 400, "User does not exist");
-      return;
-    }
-
     if (!title || !url || !recordingTime) {
       console.log(title, url, recordingTime);
       logger.error(
@@ -154,7 +96,7 @@ export async function saveAudioNote(req: Request, res: Response) {
 }
 
 export async function getAudioNotes(req: Request, res: Response) {
-  const user: { id: string; email: string; name: string } = req.body.user;
+  const user: { _id: string; email: string; name: string } = req.body.user;
   const page: number = parseInt(req.query.page as string) || 1;
   const perPage: number = parseInt(req.query.limit as string) || 10;
 
@@ -163,36 +105,7 @@ export async function getAudioNotes(req: Request, res: Response) {
   );
 
   try {
-    if (!user) {
-      logger.error(
-        `[audio-note.controller.ts] [getAudioNotes] Unauthorized access, user not found`
-      );
-      errorResponse(res, 401, "Unauthorized access");
-      return;
-    }
-
-    if (!mongoose.Types.ObjectId.isValid(user.id)) {
-      logger.error(
-        `[audio-note.controller.ts] [getAudioNotes] Unauthorized access, Invalid user ID: ${user.id}`
-      );
-      errorResponse(res, 401, "Unauthorized access");
-      return;
-    }
-
-    const userExists = await User.findById(user.id)
-      .select("-password")
-      .lean()
-      .exec();
-
-    if (!userExists) {
-      logger.error(
-        `[audio-note.controller.ts] [getAudioNotes] User does not exist: ${user.email}`
-      );
-      errorResponse(res, 400, "User does not exist");
-      return;
-    }
-
-    const audioNotes = await AudioNote.find({ author: user.id })
+    const audioNotes = await AudioNote.find({ author: user._id })
       .sort({ updatedAt: -1 })
       .skip((page - 1) * perPage)
       .limit(perPage)

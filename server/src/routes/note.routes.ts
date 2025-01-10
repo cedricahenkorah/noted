@@ -7,10 +7,12 @@ import {
   saveNote,
 } from "../controllers/note.controller";
 import { verifyJWT } from "../middlewares/verify-jwt";
+import { validateUser } from "../middlewares/validate-user";
 
 const noteRoutes = express.Router();
 
 noteRoutes.use(verifyJWT);
+noteRoutes.use(validateUser);
 noteRoutes.get("/", getNotes);
 noteRoutes.post("/", createNote);
 noteRoutes.patch("/:id", saveNote);
