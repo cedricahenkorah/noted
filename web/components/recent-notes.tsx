@@ -92,7 +92,7 @@ export function RecentNotes() {
                 <div className="flex-1 space-y-1">
                   <div className="flex items-center justify-between">
                     <Link
-                      href={`/notes/${note._id}`}
+                      href={`/dashboard/notes/new/${note._id}`}
                       className="font-medium hover:underline"
                     >
                       {note.title || "Untitled"}
