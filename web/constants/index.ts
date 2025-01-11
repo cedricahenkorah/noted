@@ -24,7 +24,7 @@ export const sideMenuItems = [
   },
   {
     title: "Notebooks",
-    url: "#",
+    url: "/dashboard/notebooks/",
     icon: Notebook,
   },
   {
