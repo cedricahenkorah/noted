@@ -23,7 +23,7 @@ export async function createAudioNote(req: Request, res: Response) {
       return;
     }
 
-    logger.error(
+    logger.info(
       `[audio-note.controller.ts] [createAudioNote] User: ${user.email} created a new audio note: ${audioNote._id}`
     );
 
@@ -49,7 +49,6 @@ export async function saveAudioNote(req: Request, res: Response) {
 
   try {
     if (!title || !url || !recordingTime) {
-      console.log(title, url, recordingTime);
       logger.error(
         `[audio-note.controller.ts] [saveAudioNote] Audio note: ${id} is missing required fields`
       );
