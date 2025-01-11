@@ -135,3 +135,83 @@ export async function addToNotebook(req: Request, res: Response) {
     return;
   }
 }
+
+export async function getNotebooks(req: Request, res: Response) {
+  const user: { _id: string; email: string; name: string } = req.body.user;
+  const page: number = parseInt(req.query.page as string) || 1;
+  const perPage: number = parseInt(req.query.limit as string) || 10;
+
+  logger.info(
+    `[notebook.controller.ts] [getNotebooks] Fetching notebooks for user: ${user.email}`
+  );
+
+  try {
+    const notebooks = await Notebook.aggregate([
+      {
+        $match: {
+          author: user._id,
+        },
+      },
+      {
+        $lookup: {
+          from: "notes",
+          localField: "_id", // Notebook ID
+          foreignField: "notebook", // Notebook reference in notes
+          as: "notes", // Alias for the joined array
+        },
+      },
+      {
+        $lookup: {
+          from: "audionotes",
+          localField: "_id",
+          foreignField: "notebook",
+          as: "audionotes",
+        },
+      },
+      {
+        $addFields: {
+          notesCount: { $size: "$notes" }, // Add a field for the note count
+          audiosCount: { $size: "$audionotes" },
+        },
+      },
+      {
+        $project: {
+          notes: 0, // Exclude the notes array from the final result
+          audionotes: 0,
+        },
+      },
+    ])
+      .sort({ updatedAt: -1 })
+      .skip((page - 1) * perPage)
+      .limit(perPage)
+      .exec();
+
+    if (!notebooks) {
+      logger.error(
+        `[notebook.controller.ts] [getNotebooks] Could not fetch notebooks for the user: ${user.email}`
+      );
+      errorResponse(res, 404, "No notebooks found");
+      return;
+    }
+
+    if (notebooks && notebooks.length === 0) {
+      logger.info(
+        `[notebook.controller.ts] [getNotebooks] Notebooks fetched successfully but empty for user: ${user.email}`
+      );
+      successResponse(res, 200, "Notebooks fetched successfully", notebooks);
+      return;
+    }
+
+    logger.info(
+      `[notebook.controller.ts] [getNotebooks] Notebooks fetched successfully for the user: ${user.email}`
+    );
+    successResponse(res, 200, "Notebooks fetched successfully", notebooks);
+    return;
+  } catch (error) {
+    logger.error(
+      `[notebook.controller.ts] [getNotebooks] Internal Server Error ${error}`
+    );
+    errorResponse(res, 500, "Internal Server Error");
+    return;
+  }
+}
