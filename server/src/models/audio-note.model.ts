@@ -16,6 +16,20 @@ const audioNoteSchema = new Schema(
     recordingTime: {
       type: Number,
     },
+    notebook: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Notebook",
+      },
+    ],
+    starred: {
+      type: Boolean,
+      default: false,
+    },
+    archived: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

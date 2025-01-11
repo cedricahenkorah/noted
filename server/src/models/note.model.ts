@@ -16,9 +16,19 @@ const noteSchema = new Schema(
       ref: "User",
       required: true,
     },
-    notebook: {
-      type: Schema.Types.ObjectId,
-      ref: "Notebook",
+    notebook: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Notebook",
+      },
+    ],
+    starred: {
+      type: Boolean,
+      default: false,
+    },
+    archived: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }
