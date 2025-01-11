@@ -8,13 +8,26 @@ import Note from "../models/note.model";
 
 export async function createNotebook(req: Request, res: Response) {
   const user: { _id: string; email: string; name: string } = req.body.user;
+  const { title, description } = req.body;
 
   logger.info(
     `[notebook.controller.ts] [createNotebook] User: ${user.email} is creating a notebook`
   );
 
   try {
-    const notebook = await Notebook.create({ author: user._id });
+    if (!title) {
+      logger.error(
+        `[notebook.controller.ts] [createNotebook] User: ${user.email} is missing a required field to create the notebook`
+      );
+      errorResponse(res, 400, "Missing required fields");
+      return;
+    }
+
+    const notebook = await Notebook.create({
+      author: user._id,
+      title,
+      description,
+    });
 
     if (!notebook) {
       logger.error(
